@@ -1,12 +1,14 @@
+import React from 'react';
+
 import './SearchResults.css';
-// import 'TrackList' from ;
+import { TrackList } from '../TrackList/TrackList';
 
 export class SearchResults extends React.Component {
     render(){
-        returns(
+        return(
             <div className="SearchResults">
   <h2>Results</h2>
-  {/* <TrackList /> */}
+  <TrackList tracks={this.props.SearchResults} />
 </div>
         )
     }
