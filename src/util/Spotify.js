@@ -2,24 +2,25 @@ const clientID = '5798d62e06134ef09bccada28de9faae'
 
 const URI = 'http://localhost:3000/'
 
-let userToken;
+let accessToken;
 
 const Spotify = {
     getAccessToken() {
-        if (userToken){
-            return userToken;
+        if (accessToken){
+            return accessToken;
         }
 
-        let accessToken = window.location.href.match(/access_token=([^&]*)/);
+        let accessTokenMatch = window.location.href.match(/access_token=([^&]*)/);
         const expiresInMatch = window.location.href.match(/expires_in=([^&]*)/);
 
         if (accessToken && expiresInMatch){
-            userToken = accessToken[1];
+            accessToken = accessTokenMatch[1];
             const expiresIn = Number(expiresInMatch[1]);
 
             //clears the parameters allowing the method to grab a new access token when the other token expires
             window.setTimeout(() => accessToken = '', expiresIn * 1000);
             window.history.pushState('Access Token', null, '/');
+            return accessToken;
         } else{
             const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${URI}`
         
@@ -27,16 +28,16 @@ const Spotify = {
         }
     },
 
-    search(searchTerm){
+    search(term){
         const accessToken = Spotify.getAccessToken();
-        return fetch(`https://api.spotify.com/v1/search?type=track&q=${accessToken}`, 
+        return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, 
         {headers: 
             {Authorization: `Bearer ${accessToken}`}
-        })
-        .then(response => {return response.json()})
-        .then(jsonResponse => {
+        }).then(response => {
+            return response.json();
+        }).then(jsonResponse => {
             if (!jsonResponse.tracks){
-                return []
+                return [];
             }
             return jsonResponse.tracks.items.map(track => ({
                 id: track.id,
@@ -44,13 +45,12 @@ const Spotify = {
                 artist: track.artists[0].name,
                 album: track.album.name,
                 uri: track.uri
-
             }));
         });
     },
 
-    savePlaylist(playlistName, trackUris){
-        if (!playlistName || !trackUris){
+    savePlaylist(name, trackUris){
+        if (!name || !trackUris.length){
             return; 
         }
 
@@ -66,11 +66,12 @@ const Spotify = {
             {
                 headers: headers,
                 method: 'POST',
-                body: JSON.stringify({name: playlistName})
+                body: JSON.stringify({name: name})
             }).then(response => response.json()
             ).then(jsonResponse => {
                 const playlistId = jsonResponse.id;
-                return fetch(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,{
+                return fetch(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
+                {
                     headers: headers,
                     method: 'POST',
                     body: JSON.stringify({uris: trackUris})
