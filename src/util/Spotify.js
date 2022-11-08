@@ -1,6 +1,3 @@
-import { SearchBar } from "../Components/SearchBar/SearchBar";
-import { Track } from "../Components/Track/Track";
-
 const clientID = '5798d62e06134ef09bccada28de9faae'
 
 const URI = 'http://localhost:3000/'
@@ -13,12 +10,12 @@ const Spotify = {
             return userToken;
         }
 
-        const accessToken = window.location.href.match(/access_token=([^&]*)/);
-        const expiresIn = window.location.href.match(/expires_in=([^&]*)/);
+        let accessToken = window.location.href.match(/access_token=([^&]*)/);
+        const expiresInMatch = window.location.href.match(/expires_in=([^&]*)/);
 
-        if (accessToken && expiresIn){
+        if (accessToken && expiresInMatch){
             userToken = accessToken[1];
-            const expiresInMatch = Number(expiresIn[1]);
+            const expiresIn = Number(expiresInMatch[1]);
 
             //clears the parameters allowing the method to grab a new access token when the other token expires
             window.setTimeout(() => accessToken = '', expiresIn * 1000);
