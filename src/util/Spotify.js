@@ -1,6 +1,6 @@
 const clientID = '5798d62e06134ef09bccada28de9faae'
 
-const URI = 'http://localhost:3000/'
+const URI = 'https://dusty-jamming.netlify.app'
 
 let accessToken;
 
