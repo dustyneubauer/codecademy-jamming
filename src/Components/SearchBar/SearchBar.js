@@ -19,7 +19,7 @@ search(){
 }
 
 handleTermChange(event){
-  this.setState({term: this.event.target});
+  this.setState({term: event.target.value});
 }
 
     render(){
